@@ -1,8 +1,19 @@
 services:
   mysticbbs:
     build: .
+    image: gryffyn/mysticbbs
     container_name: mysticbbs
     ports:
       - "23:23"
     volumes:
       - ./mystic:/mystic
+
+#  doorparty:
+#    image: bbsio/doorparty:latest
+#    container_name: doorparty
+#    environment:
+#      SYSTEM_TAG: "[??]"
+#      SSH_USERNAME: 
+#      SSH_PASSWORD: 
+#      LOCAL_PORT: "9999"
+

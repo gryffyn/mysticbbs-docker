@@ -1,5 +1,5 @@
 // =========================================================================
-// Mystic BBS Software                Copyright (C) 1997-2018 By James Coyle
+// Mystic BBS Software                Copyright (C) 1997-2020 By James Coyle
 // =========================================================================
 // File    | RECORDS.PAS
 // Desc    | This file holds the data file records for all data files used
@@ -11,9 +11,9 @@
 
 Const
   mysSoftwareID    = 'Mystic BBS';
-  mysCopyYear      = '1997-2018';
-  mysVersion       = '1.12 A39';
-  mysDataChanged   = '1.12 A39';
+  mysCopyYear      = '1997-2020';
+  mysVersion       = '1.12 A46';
+  mysDataChanged   = '1.12 A46';
   mysServerStatVer = 0;
 
   {$IFDEF 32BIT}
@@ -54,7 +54,7 @@ Const
   {$IFDEF OS2}
     PathChar = '\';
     LineTerm = #13#10;
-    OSID     = 'OS/2';
+    OSID     = 'OS2';
     OSType   = 4;
   {$ENDIF}
 
@@ -63,6 +63,9 @@ Const
   mysOriginNNTP = #13 + '--- ' + mysSoftwareID + '/NNTP v' + mysVersion + ' ' + {$I %DATE%} + ' (' + OSID + OSBIT + ')';
   mysOriginQWK  = #13 + '--- ' + mysSoftwareID + '/QWK v' + mysVersion + ' ' + {$I %DATE%} + ' (' + OSID + OSBIT + ')';
 
+  mysMaxThemeText    = 552;
+  mysTemplatePrompts  = 30;
+  mysMaxScreenInfo   = 10;
   mysMaxAcsSize      = 30;                                      // Max ACS string size
   mysMaxPathSize     = 80;
   mysMaxMsgLines     = 1000;                                    // Max message base lines
@@ -75,7 +78,10 @@ Const
   mysMaxMenuCmds     = 25;                                      // Max menu commands per item
   mysMaxMenuInput    = 12;
   mysMaxMenuStack    = 8;
-  mysMaxThemeText    = 537;
+  mysMaxTwitFilter   = 50;
+  mysMaxNetAddress   = 30;
+  mysPassLen         = 25;
+  mysDateFormat      = 'DD NNN YYYY';
 
   fn_SemFileEchoOut = 'echomail.out';
   fn_SemFileEchoIn  = 'echomail.in';
@@ -86,7 +92,7 @@ Const
   fn_tplMsgEdit     = 'msg_editor';
   fn_tplTextEdit    = 'ansitext';
 
-  ColumnValue : Array[0..1] of Byte = (80, 40); // 143 and 160
+  ColumnValue : Array[0..1] of Byte = (80, 40); // 132 143 and 160?
 
 Type
   SmallWord = System.Word;
@@ -94,8 +100,17 @@ Type
   Word      = SmallWord;
 
   RecMessageText = Array[1..mysMaxMsgLines] of String[132];
-  RecFileText    = Array[1..100] of String[160];
+  RecFileText    = Array[1..100] of String[200];
   AccessFlagType = Set of 1..26;
+
+  RecLogRoller = Record
+    Level    : Byte;                   // 1=Normal, 2=Verbose, 3=DEBUG
+    RollType : Byte;                   // 0=None, 1=File Size, 2=Day
+    Files    : Word;                   // # Files to keep
+    Size     : Cardinal;               // File size to trigger roll (KB)
+    Cached   : Boolean;                // Cached log writing?
+    DateFmt  : String[25];             //
+  End;
 
   RecEchoMailAddr = Record
     Zone,
@@ -132,8 +147,8 @@ Type
     FtpInDir    : String[60];
     FtpOutDir   : String[60];
     MaxPKTSize  : Word;
-    LastRecv    : LongInt;
-    LastSent    : LongInt;
+    LastRecv    : LongInt;   // Unix date stamp
+    LastSent    : LongInt;   // Unix date stamp
     LastReset   : LongInt;
     InFiles     : Cardinal;
     InSize      : Cardinal;
@@ -157,7 +172,11 @@ Type
     Groups      : Array[1..15] of Word;
     Flags       : AccessFlagType;
     SysopName   : String[30];
-    Res         : Array[1..55] of Byte;
+    UseSSL      : Byte;              //0=No, 1=Yes, 2=Forced
+    CryptKey    : String[20];
+    FileBoxHold : LongInt;
+    CrashErrors : Word;
+    Res         : Array[1..27] of Byte;
   End;
 
   RecQwkNetwork = Record
@@ -200,13 +219,13 @@ Type
     LogsPath        : String[mysMaxPathSize];
     MsgsPath        : String[mysMaxPathSize];
     // Do not change anything before this
-    AttachPath      : String[mysMaxPathSize];
-    ScriptPath      : String[mysMaxPathSize];
+    ThemePath       : String[mysMaxPathSize];
+    UNUSED101       : String[mysMaxPathSize];
     QwkPath         : String[mysMaxPathSize];
     SemaPath        : String[mysMaxPathSize];
     InboundPath     : String[mysMaxPathSize];
-    MenuPath        : String[mysMaxPathSize];
-    TextPath        : String[mysMaxPathSize];
+    UNUSED102       : String[mysMaxPathSize];
+    UNUSED100       : String[mysMaxPathSize];
     OutboundPath    : String[mysMaxPathSize];
  // GENERAL SETTINGS
     BBSName         : String[30];
@@ -304,7 +323,11 @@ Type
  // ECHOMAIL NETWORKS
     NetAddress      : Array[1..30] of RecEchoMailAddr;          // echomail addresses
     NetPrimary      : Array[1..30] of Boolean;
-    Res1            : Array[1..210] of Byte;
+    Res1            : Array[1..70] of Byte;
+    LogMIS          : RecLogRoller;
+    LogNode         : RecLogRoller;
+    LogPOLL         : RecLogRoller;
+    LogQWK          : RecLogRoller;
     NetDomain       : Array[1..30] of String[8];                // echomail domains (5D)
     NetDesc         : Array[1..30] of String[25];               // echomail network description
  // OFFLINE MAIL (should include local qwk path)
@@ -326,7 +349,7 @@ Type
     FreeUL          : LongInt;
     FreeCDROM       : LongInt;
     MaxFileDesc     : Byte;
-    FCommentLines   : Byte;
+    MaxDescCols     : Byte;
     FCommentLen     : Byte;
     FProtocol       : Char;
     TestUploads     : Boolean;
@@ -338,8 +361,8 @@ Type
     AcsSeeFailed    : String[mysMaxAcsSize];
     AcsDLFailed     : String[mysMaxAcsSize];
  // INTERNET SERVER SETTINGS
-    INetDomain      : String[25];
-    UNUSED1         : Array[1..22] of Byte;
+    INetDomain      : String[45];
+    UNUSED1         : Array[1..2] of Byte;
     INetMaxNodes    : Byte;
     UNUSED2         : Array[1..22] of Byte;
  // UNSORTED
@@ -372,10 +395,19 @@ Type
     SMTPAuth        : Byte;
     SMTPIPType      : Byte;
     SMTPEnabled     : Boolean;
-    UNUSED9         : Array[1..399] of Char;
+    SMTPPWReset     : Boolean;
+    PassMinLen      : Byte;
+    PassMinCap      : Byte;
+    PassMinNum      : Byte;
+    PassMinSym      : Byte;
+    PassStorage     : Byte;
+    PassIterations  : LongInt;
+    SMTPSSL         : Byte;
+    AutoWhiteIP     : Byte;                      // 0=Per User, 1=All
+    UNUSED9         : Array[1..387] of Char;
   End;
 
-Const
+Const                                            // User Flags
   UserLockedOut  = $00000001;
   UserNoRatio    = $00000002;
   UserDeleted    = $00000004;
@@ -387,6 +419,8 @@ Const
   UserQWKNetwork = $00000100;
 //  UserNoDelete   = $00000200;
   UserForcePW    = $00000400;
+  UserWhiteIP    = $00000800;
+  UserInvisible  = $00001000;
 
 Type
   UserPasswordRecord = Array[1..101] of Byte;
@@ -457,7 +491,7 @@ Type
     QwkExtended  : Boolean;
     QwkNetwork   : LongInt;
     EmailValDate : LongInt;                                // Unix date?
-    LegacyPW     : String[15];
+    Reserved1    : String[15];
     Reserved     : Array[1..108] of Byte;
   End;
 
@@ -521,8 +555,8 @@ Type
   End;
 
   RecMessageScan = Record    // *.SCN for message bases
-    UserID  : LongInt;
-    NewScan : Byte;
+    UserID  : LongInt;       // User UID
+    NewScan : Byte;          // 0=Off  1=On  2=Forced
     QwkScan : Byte;
   End;
 
@@ -652,11 +686,18 @@ Type
     DescLines : Byte;
   End;
 
+Const
+  gfHidden = $00000001;
+
+Type
   RecGroup = Record
     UniqueID : LongInt;
-    Name     : String[30];
-    ACS      : String[30];
-    Hidden   : Boolean;
+    Name      : String[80];
+    ShortName : String[40];
+    InfoFile  : String[40];
+    ACS       : String[mysMaxACSSize];
+    Flags     : LongInt;
+    Reserved  : Array[1..4] of Byte;
   End;
 
   PtrMenuCmd = ^RecMenuCmd;
@@ -728,13 +769,10 @@ Type
     Reserved  : Array[1..3] of Byte;
   End;
 
-Const
-  ThmAllowASCII = $00000001;
-  ThmAllowANSI  = $00000002;
-  ThmLightbarYN = $00000004;
-  ThmFallback   = $00000008;
-
 Type
+  RecPromptData   = Array[0..mysMaxThemeText] of AnsiString;
+  RecPromptSource = Array[0..mysMaxThemeText] of Byte;
+
   RecThemeBox = Record
     Frame      : Byte;
     Style      : Byte;
@@ -756,9 +794,22 @@ Type
 
   PtrTheme = ^RecTheme;
   RecTheme = Record
+    Order         : Word;
+    ACS           : String[mysMaxACSSize];
     Flags         : LongInt;
     FileName      : String[20];
+    PInherit      : String[20];
+    TInherit      : String[20];
+    MInherit      : String[20];
+    SInherit      : String[20];
+    Author        : String[30];
+    Group         : String[30];
+    Contact       : String[60];
     Desc          : String[40];
+    FallBack      : Boolean;
+    ASCII         : Boolean;
+    ANSI          : Boolean;
+    BarYN         : Boolean;
     TextPath      : String[mysMaxPathSize];
     MenuPath      : String[mysMaxPathSize];
     ScriptPath    : String[mysMaxPathSize];
@@ -791,7 +842,6 @@ Type
     Box2          : RecThemeBox;
     Box3          : RecThemeBox;
     Box4          : RecThemeBox;
-    Reserved      : Array[1..29] of Byte;
   End;
 
   BBSListRec = Record
@@ -855,6 +905,7 @@ Type
     ServerSlot : Integer;
     ClientSlot : Integer;
     Updated    : LongInt;
+    ProcessID  : LongInt;
   End;
 
 (* Chat room record - partially used by the multi node chat functions *)
@@ -862,10 +913,22 @@ Type
   RoomRec = Record
     Name     : String[40];             { Channel Name }
     Reserved : Array[1..128] of Byte;  { RESERVED }
-    // moderator ACS
-    // change topic ACS
-    // join ACS
-    // topic
+  End;
+
+  RecLastLogin = Record
+    DateTime     : Cardinal;
+    NewUser      : Boolean;
+    PeerIP       : String[45];
+    PeerHost     : String[80];
+    PeerCountry  : String[60];
+    Source       : Byte;                               // ServerType
+    CallerNumber : Cardinal;
+    UserName     : String[30];
+    City         : String[25];
+    UserID       : Cardinal;
+    Gender       : Char;
+    UserNote     : String[30];
+    OptionalData : Array[1..3] of String[60];
   End;
 
 (* CALLERS.DAT holds information on the last ten callers to the BBS. This *)
@@ -909,29 +972,6 @@ Type
     Reserved   : Array[1..2] of Byte;
   End;
 
-  NewRecHistory = Record
-    Date       : Cardinal;
-    Emails     : Word;
-    Posts      : Word;
-    Downloads  : Word;
-    Uploads    : Word;
-    DownloadKB : Cardinal;
-    UploadKB   : Cardinal;
-    Calls      : Word;
-    NewUsers   : Word;
-    TELNET     : Word;
-    RLOGIN     : Word;
-    SSH        : Word;
-    FTP        : Word;
-    POP3       : Word;
-    SMTP       : Word;
-    NNTP       : Word;
-    HTTP       : Word;
-    BINKP      : Word;
-    Hourly     : Array[0..23] of Byte;
-    Reserved   : Array[1..10] of Byte;
-  End;
-
   RecProtocol = Record
     OSType  : Byte;
     Active  : Boolean;
@@ -966,31 +1006,11 @@ Type
     Room     : Byte;  { Chat room number. 0 = chat broadcast }
   End;
 
-  SingleStatRecord = Record
-    Connections : Cardinal;
-    BusyCount   : Cardinal;
-    Blocked     : Cardinal;
-  End;
-
-  ServerStatRecord = Record
-    Revision : Word;
-    Created  : LongInt;
-    TELNET   : SingleStatRecord;
-    RLOGIN   : SingleStatRecord;
-    SSH      : SingleStatRecord;
-    FTP      : SingleStatRecord;
-    NNTP     : SingleStatRecord;
-    HTTP     : SingleStatRecord;
-    BINKP    : SingleStatRecord;
-    POP3     : SingleStatRecord;
-    SMTP     : SingleStatRecord;
-  End;
-
   ServerInfoRecord = Record
     Active         : Boolean;
     IPV4Adapter    : String[19];
     IPV6Adapter    : String[39];
-    AdapterType    : Byte;      // 0 IPV4, 1 IPV6, 2 BOTH
+    AdapterType    : Byte;                       // 0 IPV4, 1 IPV6, 2 BOTH
     ServerType     : LongInt;
     ProtID         : String[8];
     Port           : Word;
@@ -1015,14 +1035,22 @@ Type
     // HTTP
     WebRoot        : String[mysMaxPathSize];
     //UNSORTED
-    Reserved       : Array[1..207] of Byte;
+    UNUSED11       : Byte;                       // 0=No, 1=Yes, 2=Forced
+    SSLPort        : Word;
+    Reserved       : Array[1..204] of Byte;
   End;
 
-  AnnouncementRecord = Record
+Const
+  afAnnounced = $00000001;
+
+Type
+  AnnounceRecord = Record                        // ANNOUNCE.DIR & DES
+    Flags     : LongInt;
     DateTime  : LongInt;
     EchoTag   : String[40];
     FileName  : String[70];
-    Announced : Boolean;
+    FileSize  : Int64;
+    DescPtr   : LongInt;
   End;
 
   MailQueueRecord = Record

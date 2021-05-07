@@ -1,0 +1,8 @@
+services:
+  mysticbbs:
+    build: .
+    container_name: mysticbbs
+    ports:
+      - "23:23"
+    volumes:
+      - ./mystic:/mystic

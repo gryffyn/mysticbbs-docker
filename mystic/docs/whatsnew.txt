@@ -2822,3 +2822,1122 @@
 
  + FileFix now has an %ALL function that mimics the functionality of the
    Areafix equivalent.
+
+   <ALPHA 1.12 A39 RELEASED -- April 20, 2018>
+
+ + Door command lines now have %R which will return the user name without
+   underscores in the name.
+
+ ! Fixed a bug where groups could be created with a duplicate ID.  You may
+   wish to double check you groups to make sure none of them have the same
+   ID.
+
+ ! Fixed a bug in Python GotoXY function that would cause a crash when using
+   it.
+
+ + The MUTIL ImportNA function now allows a "use_ansi" default value to be
+   defined when creating message bases.
+
+ + The MUTIL Echomail Import function now allows a "use_ansi" default value
+   to be defined when automatically creating message bases.
+
+ + The MUTIL ImportMessageBase function now allows a "use_ansi" default value
+   to be defined when creating message bases.
+
+ + MIS FTP now logs when a SysOp deletes a file from a filebase via FTP
+
+ + MIS FTP/NNTP/SMTP/POP3 servers now have a better idle/timeout system which
+   will cause the server to shutdown more gracefully when exiting MIS with
+   active connections.
+
+ + New menu command: M! This is a rewrite of the message area index reader
+   rebuilt to work identically to the file base index lister.  See the
+   msg_index.ini file for more details.  Command line option is the template
+   name or default to msg_index.ini if none is specified.  I am not removing
+   the old one just yet so that people have time to adapt to the new version
+   and to test it for issues, but please note the old one will likely be
+   replaced by this new one eventually once the features are all done and
+   tested.
+
+ + New MPL variable: UserPosts contains the number of posts a user has made
+
+ + New MPL variable: UserDLs contains the number of downloads user has made
+
+ + New MPL variable: UserULs contains the number of uploads user has made
+
+ + Mystic now has a new User Editor which doesn't look a whole lot different
+   than the old one, except that it incorporates some newer ideas that were
+   introduced into the Echomail Node editor that makes jumping around between
+   pages of information easier.  One major thing to note is that you can no
+   longer view user passwords and can now only "reset" user passwords.
+
+   Like the other page-based editors you can scroll from the first or last
+   item to change page, use the tab key, the pageup/down keys, the left
+   and right arrows, or enter a page number directly to shift between pages.
+
+ + Mystic now has a password policy in System Configuration where the minimum
+   password length can be set along with number of required capital letters,
+   numbers, and symbols.  It is highly recommended that the minimum password
+   length is set to at least 7 characters.  Some default prompts have been
+   updated to support this new feature: 18, 419, 420. If you have custom
+   themes, you should take a look at the new defaults and consider updating
+   your custom prompts as well.
+
+ + Mystic now allows the option to store passwords in case insensitive
+   cleartext and case insensitive hashing using industry standard methods for
+   password storage.
+
+ + Mystic now allows passwords to be stored using PBKDF2 with SHA512-bit
+   hashing at variable configurable iterations.  What does this mean?  The
+   biggest benefit is that when enabled, Mystic will never store a user's
+   password anywhere in the BBS system.  This system is the same system used
+   for Password Managers such as LastPass, 1Password and operating systems
+   such as MacOS.  In fact, with its variable iterations Mystic could be
+   considered to be more secure as those products in terms of cracking a
+   user's password hash.
+
+   Two new options are added into the Password Policy options, the first is a
+   password storage method which has three options:
+
+      ClearText Case Insensitive       (This was the legacy storage method)
+      ClearText Case Sensitive
+      PBKDF2 SHA512 Hash               (This is also case sensitive)
+
+   It is highly recommended to use password hashing and stop using cleartext
+   passwords.  With password hashing enabled, a person could be given your
+   users.dat and they still would not be able get a user's password.
+
+   The second option is VERY important when using PBKDF2 and that is the
+   number of iterations the process will use when hasing a password.  The
+   default value is 1000 and may be considered a little low in terms of
+   enterprise level password storage but it works at a reasonable speed for most
+   systems.  In general, the higher the number of iterations the more secure it
+   is, but the longer it will take for Mystic to store or check a password.
+   Setting this value to 10,000 on an original Raspberry Pi for example may
+   cause Mystic to take 10+ seconds to store or check a password and for many
+   that may be too slow.
+
+   It is recommended that it is kept at 3000 or lower for performance reasons
+   unless you know what you are doing.  Even at this level PBKDF2 with a 512
+   bit hashing system is more secure than any other BBS software today.  If
+   you find the delay for 1000 is too short you can adjust the value but just
+   beware that if you change hardware someday, those values still remain...
+
+   The way the system works is that a user's password is stored in the format
+   configured at the time their password is set, including the iterations. The
+   password remains stored in this format even if you change the storage method
+   until the user changes their password or you reset it using the user editor.
+   It is important that you do not set the iteration level too high for the
+   hardware you are using to run your BBS now or in the future.
+
+ + Mystic user passwords have now been expanded to 25 characters maximum.
+
+ + Mystic now allows passwords to be reset via Internet e-mail.  This option
+   can be enabled in System Configuration -> Password Policy and will require
+   that the SMTP sendmail/relay options are configured in the Server General
+   Options tab.  The user must also have a valid e-mail address assigned to
+   their user account.
+
+   If enabled, the user will be sent an e-mail with a randomly generated code
+   and then prompted by the BBS to enter the code.  Upon entering the code
+   the user will be prompted to change their password and finally logged into
+   the BBS as if they had typed their password in correctly.
+
+   8 new prompts have been added to the themes to support this new feature
+   most having 4 promptinfo MCI codes active: &1=min length  &2=min caps
+   &3=min nums  &4=min symbols.  These new prompts (538-546) will need to
+   be added to your custom themes if you have them.  See the upgrade.txt
+   for more information.
+
+ + New Configuration theme: Turbo Vision.  Not really a favorite of mine,
+   but one of the goals of this theme option is for nostalgia preservation
+   and the TurboVision look was widely used in the BBS scene.
+
+ + Mystic's built in RAR archive functions should now work with newer RAR5
+   format RAR files.  If you encounter any issues viewing a RAR file please
+   e-mail me a link to download the same file or the file itself so I can
+   take a look at it.  Keep in mind Mystic does not allow you to view
+   encrypted archives.
+
+ + Changed the e(X)it command in the text editor to (Q)uit to match that of
+   the ANSI editor.
+
+ + New ACS function "OV" returns true if the user has validated their current
+   e-mail address.
+
+ + Email address fields have been expanded to 60 characters, input field
+   length by default is 40 characters (up from 35).
+
+ + Mystic will now validate that the user enters a valid e-mail address
+   format when prompting for e-mail address during new user application and
+   when editing user information.  Two new prompts have been added that will
+   be displayed when they enter an invalid e-mail address: #463, #486.  You
+   should update your prompts based on the new defaults.
+
+ + New menu command: -V (Validate e-mail address).  This function will send
+   a code to the user's e-mail address and then prompt them to enter it on
+   the BBS.  Upon entering the code successfully, the "OV" ACS command will
+   begin to report true.  If the optional data field contains a security level
+   Mystic will also update the user's security profile. The OV ACS can also be
+   used in order to perform any number of actions if validation is successful.
+
+   New prompts have been added to support this: #547-#552.  You will need to
+   add these if you have custom themes.
+
+ + Mystic now supports CNET Control-Y color codes.  These work in file
+   description .DIZ importing, in file descriptions, in message reading, in
+   Mystic's file/ANSI viewer and ANSI gallery, and Mystic's ANSI editor can
+   now load CNET color coded files.  Thanks to NuSkooler for initial info
+   about the color codes.
+
+ + New Python function: "logerror(string)".  This creates an entry into the
+   global error log of the string passed to it, and also creates an entry in
+   the current node log as well.
+
+ + The group editors now have a Move function that allows repositioning the
+   order of groups.  Simply Copy a group and them move to where you want to
+   place it and select Move.
+
+ + The file base editor now also has a move function.
+
+ ! When tagging a bunch of bases in the message base editor and selecting
+   Sort, it was possible to press ESCAPE and wipe out your message base
+   configuration entirely.  Fixed.  Sorry to anyone affected by this.
+
+ ! Fixed a bug in the global message base editor where setting the Max Msgs
+   value could cause the value to get garbled when updating the bases.
+
+ + Two new options to the GD menu command (Display a file):
+
+      /MCI   - If this option is supplied, Mystic will not filter out any MCI
+               codes including pipe colors.
+
+      /ABORT - If this option is supplied, Mystic will not allow the display
+               file to be aborted.  By default they are allowed.
+
+ + Mystic's SMTP sendmail function now supports opportunistic SSL via the
+   TLS v1.2+ protocol.  Combined with CRAM-MD5 authenication, this provides
+   encryption of both the password handshake and the overall session.
+
+ + Message Box MCI codes no longer automatically pad the header text with a
+   space on each side. This makes it consistent with other box functions and
+   allows a bit more flexibility.
+
+ + MUTIL echo import now gives a more meaningful message when a PKT password
+   is defined and there is no echomail node configured for the origin address
+
+ + Mystic BINKP server and FIDOPOLL now support opportunistic SSL (TLS v1.2+)
+   using a proprietary extension of the BINKP protocol.  This means that it
+   will only work with other Mystic BBS clients and servers, but I do plan
+   to document the extension and send it to the authors of other mailers in
+   hopes that it can be standardized.
+
+   BINKP server settings now have a "Use SSL" setting which can be set to
+   one of three settings:
+
+      No     : BINKP server will not offer SSL extension at all
+      Yes    : BINKP server WILL offer SSL extension optionally
+      Forced : BINKP server will refuse all connections not using SSL
+
+   EchoMail Nodes now have a similar setting which will be used when polling
+   for new mail:
+
+      No     : FIDOPOLL will not use SSL extension at all
+      Yes    : FIDOPOLL WILL use SSL if the server supports it
+      Forced : FIDOPOLL will refuse to exchange mail with a server
+               unless it supports SSL
+
+ + For those of you who downloaded the A40 pre-alpha before Dec 16th, you
+   will have password issues.  To fix this you can copy over the latest
+   upgrade.exe and place your A39 users.dat into DATA and execute "upgrade
+   password".
+
+ + Message bases with an origin line set to a blank will now inherit the
+   default value set in System Configuration > Message Settings.  This is how
+   it was supposed to work but it wasn't.  The origin line will now also be
+   blank when creating a new message base, instead of setting the value to
+   the current default.  This also includes MUTIL import/create functions.
+
+ + The random origin line selection engine (@ORIGIN=) will now be processed
+   if it is defined in the default origin line.  In the past it was only
+   processed when defined for an individual message base.
+
+ ! Mystic will no longer make echomail bundles with a bracket in the filename
+   extension which could happen in a certain circumstance.
+
+ ! Fixed a bug where Mystic was adding a point to the INTL kludge origin/dest
+   addresses when dealing with point systems.
+
+ + Message Base editor now has a /A command to select all bases.
+
+ + File Base editor now has a /A command to select all bases.
+
+ + File Base editor now has a /G Global Editor similar to the Message Base
+   editor
+
+ + Echomail nodes now have an "Encryption Key" option.  When this option is
+   set to a non-blank value, Mystic will encrypt all of the contents of
+   Netmail messages to this node with an AES-256 encryption.  This completes
+   a fully encrypted echomail solution as both transport and private messages
+   are secured.
+
+   This is done in a way that is completely transparent to unsupporting
+   systems, meaning that you can still route netmail through systems and they
+   will not harm the encrypted netmails!  The encryption also hides the
+   message subject, so when combined with Area/Filefix passwords will no
+   longer be readable. You must have Cryptlib installed for this to work.
+
+   The other echomail node must of course have the same key configured for
+   your node in order to decrypt the netmail when it arrives.  This works the
+   same way as any other password setting in echomail nodes.
+
+   When routing Netmail, Mystic will intelligently re-encrypt the message
+   between routing points when possible.  In other words if you have a point
+   system who sends from 555:1/2.1 to 555:1/1 but is routed through 555:1/2,
+   Mystic at 555:1/2 will know that it has an encryption agreement between
+   both 555:1/2.1 and 555:1/1 so it will decrypt the message from 555:1/2.1
+   and then reencrypt it for 555:1/1 before routing it.
+
+ + Mystic Area/Filefix will now accept commands that start and end with a
+   percentage sign (as opposed to just starting with) so: %LIST and %LIST%
+   will work, for example.
+
+ ! Mystic wasn't properly using UTC time when adding the @VIA kludge while
+   routing Netmail (it was using local system time).
+
+ ! Reviewed Netmail routing with point systems and corrected a couple little
+   bugs with addressing.  This will hopefully have no negative effect on any
+   other behavior.
+
+ + Mystic BINKP now sends the local time and time zone information whenever
+   it connects to another BINKP server.
+
+ + MUTIL MsgPack now no longer users the Mystic temp directories while
+   packing message bases.  Instead, it creates temp files in the same
+   directory as the message base.  This should allow MsgPack to continue to
+   rename files when message bases are stored on different devices than the
+   root Mystic directory.
+
+ + New MPL function to go along with new password engine:
+
+     Function CheckPW (PW: String) : Boolean;
+
+   This function checks the supplied PW against the current loaded User
+   and returns true if the password matches or false if it does not.
+
+ + New MPL function to go along with new password engine:
+
+     Procedure SetPW (PW: String);
+
+   This procedure sets the password for the currently loaded users (ie
+   the User storeed in the current User variables)
+
+ + New MPL function to go along with new password engine:
+
+     Procedure ValidPW (PW: String) : Byte;
+
+   This procedure checks the password passed in PW against the configured
+   password policy and returns a result depending on its status:
+
+     1 = Password does not meet min length
+     2 = Password does not meet min cap letters
+     3 = Password does not meet min symbols
+     4 = Password does not meet min numbers
+
+   <ALPHA 1.12 A40 RELEASED -- Dec 25, 2018>
+
+ ! Fixed the broken SSH that creeped its way into A40.
+
+ + Changed the date format in message quoting to "DD MMM YYYY"
+
+ ! MUTIL echo export should no longer toss messages back to the origin node
+
+   <ALPHA 1.12 A41 RELEASED -- Dec 27, 2018>
+
+ ! Reverted back to Free Pascal 3.0.2 and magically a lot of the problems
+   have gone away with the Unix versions.
+
+ + Increased the BINKP max file queue per session to 200 files, up from 100
+
+ + Mystic BINKP now sends the build date, time and operating system with
+   bit level as part of the welcome
+
+ + Mystic BINKP now sends the queue size (# of files and total bytes) after
+   authentication and before starting to transfer files
+
+ ! Fixed some issues that were causing IPV6 servers and clients to act
+   differently in Unix based systems.
+
+ + Prompt #464 message quote text now has &4 MCI code which is replaced by
+   the time that the original message was written.
+
+ + Mystic will now log to the node log if a user attempts to post to a
+   message base but does not have access to do so.
+
+ + Mystic will now log Python errors to the BBS node log and the Mystic
+   global errors.log
+
+ + MUTIL now has a function to export a FILEBONE.NA file based on the file
+   bases.  A new [Export_FILEBONE.NA] stanza has been added to the INI file
+   for more information see the default mutil.ini file.
+
+ + MIS servers now show "Server busy" instead of "BUSY" when a connection is
+   received when all client slots are in use.  "BUSY" will still be shown by
+   Mystic.
+
+ + New option for each Echomail node: Crash Limiter.  When FidoPoll sends
+   files via BINKP it will skip queueing any files for sending larger than
+   this value.  The value is defined in kilobytes.
+
+ + MUTIL now allows the loglevel to be defined in each specific stanza.  If
+   the loglevel is defined within a process' stanza, then that loglevel will
+   override the value set in the general stanza just for that process.
+
+   <ALPHA 1.12 A42 RELEASED -- Feb 2, 2019>
+
+ + Mystic now has two new door MCI codes:
+
+     %A - Returns the user's realname with spaces replaced with underscores
+     %B - Returns the user's realname
+
+ + Expanded the BBS domain from 25 to 45 characters.
+
+ + Mystic will now inform you if you try to edit a message that has already
+   been sent.  It already informs you if the message was sent while you were
+   editing it (which tends to happen if you have messages set to send on save
+   as opposed to logoff).
+
+ + Mystic's private user to user chat system now has a split screen chat
+   option.  A new template userchat.ini and userchat.ans are required now to
+   be accessible by your theme otherwise your user to user chat will not
+   work.  See the default installation for these new files.
+
+ + Mystic now has Mystic-DOS, a built in command shell console that allows
+   for various disk and BBS functions within a command shell interface that
+   mimics both Bash and MS-DOS/Windows shell commands.  Disk management,
+   executing MPL and Python scripts, snooping and chatting with users on
+   other nodes, editing ANSI and text files, etc.
+
+   A new menu command *D has been added but it cannot be executed unless the
+   user has a security level of 255.
+
+ ! Fixed a bug in Mystic Python that would cause a crash whenever the
+   msg_open function failed to open or create a message base.
+
+ ! Fixed a bug in Mystic wildcard match functions and increased speed by a
+   good amount.
+
+ + Mystic now logs the user's country in the node log along with their IP
+   and hostname (when country blocking is enabled)
+
+ + The install program now has an "extract" function to go along with the
+   replace function.  Type "install help" for more details.
+
+ + MUTIL now has an AutoHatch function to automate periodic hatching
+   of files from the file base.  See default mutil.ini for more information.
+
+ + New SysOp menu command: *3 This allows a SysOp to snoop (watch) a user on
+   another node.
+
+ + You can now press CTRL-E when editing menu settings on the Display File
+   field to open up the ANSI editor.
+
+ ! In various places whenever a file rename or move needs to occur, Mystic
+   will first try a fast move and if it fails, it will attempt to copy the
+   file to the new destination and then delete the original.
+
+ + When reading forced message bases, Mystic will now allow the user to quit
+   reading if they've already read all of the messages.
+
+ + Mystic Message Base and File Base editors now have an /U Unsubscribe option
+   This command will automatically generate an Areafix or Filefix Netmail
+   request to unsubscribe from a base (and option to delete the base after)
+
+ + The Echomail node editor now has three new options in the / menu:
+
+     1 - Send Areafix request to the selected node
+     2 - Send Filefix request to the selected node
+     3 - Send Netmail message to Sysop of the selected node
+
+   All of these will allow you to quickly and easily contact an Echomail node
+   to communicate with the SysOp or to add/remove message and file bases or
+   anything else the Area/Filefix commands allow without having to fumble
+   around with addresses and passwords!
+
+ + System Configuration now has a log file viewer option in the Other menu
+   next to the Text and ANSI editors.
+
+ + New Menu command: *4 This opens the log file viewer
+
+ + Text editor now has a (CTRL+J) Jump to Line number option
+
+ + Text editor now has a (CTRL+W) Where function which allows full boolean
+   line searching using paranthesis and &|! operators
+
+ + Text editor now has a (CTRL+A) Again function which repeats the last
+   Where function again
+
+ ! MUTIL was not adding a NULL at the end of the last PKT when doing a rescan
+   of message bases.
+
+ + When importing and forward netmail, MUTIL will now allow an address to be
+   defined, allowing Netmail to a certain name on the current setup to be
+   forwarded to different name and/or network node.  See default MUTIL.INI for
+   more information.
+
+ + New menu command "UF" Edit Twit Filter.  This allows a user to edit their
+   twit filter, which is a list of users whose messages will be automatically
+   skipped when reading message bases.  Each user can define up to 50 users
+   they wish to ignore.
+
+ + MUTIL now creates and removes BUSY data before and after processing TIC
+   files and hatches.
+
+ ! Fixed a bug when using the save file to message menu command where Netmail
+   messages were not properly being flagged as private.
+
+ + The SysOp name in the EchoMail node editor can now have an address appended
+   to it, and Mystic will send the message to that address when using the
+   "NetMail SysOp" option.  So if the Echomail node address is 21:1/100 but
+   when you use the Netmail to SysOp function you want to send it to 21:1/101
+   instead because 1:/100 is a hub only, then you can set the SysOp name to
+   "Avon@21:1/101" to override the address.
+
+   <ALPHA 1.12 A43 RELEASED -- Mar 9, 2019>
+
+ + New MPL variable: CfgDefTheme returns the configured default theme
+
+ + New MPL variable: CfgTextFB returns the theme's text fallback theme
+
+ + New MPL variable: CfgScriptFB returns the theme's script fallback theme
+
+ + New MPL variable: CfgFallback returns true or false if default theme
+   fallback is enabled for current theme
+
+ + New Python CFG variable: deftheme returns the configured default theme
+
+ + New Python CFG variable: textfb returns the theme's text fallback theme
+
+ + New Python CFG variable: scriptfb returns the theme's script fallback
+
+ + New Python CFG variable: fallback returns the themes' fallback setting
+
+ + Updated default BULLETIN.MPS file to support scanning for bulletins in
+   all theme fallback directories.
+
+ ! MPLC was not properly scanning all directories recursively when -ALL was
+   supplied.  Additionally, MPLC will now not attempt to compile a .mps file
+   that is 0 bytes in size.
+
+ + New Theme system has been implemented.  The default text, menu, and
+   scripts directories in the System Configuration have been removed and
+   replaced by a single Themes directory.  This directory specifies the root
+   directory where all Mystic BBS themes are found Ex: c:\mystic\themes\
+
+   THEME.DAT has been depreciated and is no longer used by Mystic BBS
+
+   Theme prompts are no longer restricted to being 255 characters or less,
+   they now have an unlimited length.
+
+   UPGRADE utility will convert your existing BBS to the new themes structure
+   for you so you do not have to do anything.
+
+   Each theme itself now has a root directory that can be up to 20 characters
+   in length, and consists of three subdirectories.  Each theme has a
+   theme.ini in the root directory that contains various configuration options
+   that can be configured by text editor or the Themes Editor.
+
+   Each them can also have a prompts.txt which contains one or more Mystic BBS
+   prompts.  Any prompts not in prompts.txt are loaded from the theme's
+   fallback if one is specified, and ultimately the "default" prompt found in
+   prompts.dat (new to Mystic BBS).
+
+   Themes can now contain only the prompts that are actually customized instead
+   of requiring ALL prompts to be in a theme's prompt file, and then it can
+   fallback and pull inherited prompts or defaults.  This means that you will
+   no longer have to update your prompts for every theme when new prompts are
+   added or existing prompts that you haven't customized are changed
+
+   Scripts and menus work the same as prompts do with the capability to fall
+   back to another theme and/or ultimately the configured default theme if
+   that feature is enabled.
+
+   The directory structure looks like this:
+
+      \mystic\themes                                - Root Theme directory
+      \mystic\themes\default                        - Default theme directory
+      \mystic\themes\default\theme.ini              - Theme settings
+      \mystic\themes\default\prompts.txt            - Prompts (optional)
+      \mystic\themes\default\text                   - Text/template files
+      \mystic\themes\default\menus                  - Menus
+      \mystic\themes\default\scripts                - Scripts
+
+   There is no installation process for a theme as Mystic will detect them
+   dynamically.  If you have a Theme and you wish to share it, all you have to
+   do is ZIP up the theme directory (default as shown above) and give it to
+   whoever you want to share it with.  They just paste the directory into their
+   root theme directory and it will instantly appear in Mystic BBS without any
+   other work required.  This makes it very easy to create, update, and share
+   custom themes.
+
+ + Themes now have an input barrier option, where a character can be defined
+   to be displayed on the left and right side of string-based input prompts.
+   LeftChar/LeftAttr RightChar/RightAttr can all be defined in theme.ini and
+   one or both character can be enabled.
+
+ + New MCI code |IB disables the input barrier for the next string input
+   prompt.
+
+ + New Python function "setpinfo(byte, string)" text the prompt info value
+   for byte to the text in string. Ex: setpinfo(1, "Hello world!")
+
+ + New Python has many new functions for accessing the file listings.  A new
+   demo filelist.mpy has been added to the default installation to demonstrate
+   these functions.  The following new functions have been created:
+
+   function "fl_open(basefn)" opens a filelist where basefn is the filename
+   for the file base, returning a handle to the filelist  If a filelist does
+   not exist one will be created.
+
+   function "fl_close(handle)" closes an opened filelist
+
+   function "fl_seek(handle, filenumber, skip)" seeks to a file number. This
+   should always be called before cycling through file listing.  If Skip is
+   set to true, then Deleted records will not be returned.
+
+   function "fl_next(handle)" return the next available file
+
+   function "fl_prev(handle)" return the previous available file
+
+   function "fl_found(handle)" returns true if a message from the last seek
+   or next or prev function has been found
+
+   function "fileinfo = fl_getfile(handle)" returns a dictionary with
+   information about the current file
+
+   function "filedesc = fl_getdesc(handle)" returns a list that contains the
+   file description.
+
+ + BUSYLOG debug logging has finally been disabled.
+
+ + Two new Python functions:
+
+     function dateu2d(date) : date - This converts a unix date to a DOS
+     crunched date used in places in Mystic.  This date format is being
+     replaced in Mystic but it still exists in some areas.
+
+     function dated2u(date) : date - This converts a DOS crunched date to a
+     Unix timestamp
+
+ + New Python function: function acsnogroup(access string) : boolean
+   Process an access string but returns "true" for all group checks regardless
+   of the user's group membership.  Returns true or false is user has access
+
+ + New Python function: procedure setprompt(number, text)
+   This sets a theme prompt to the value of text for the duration of the user's
+   session or until they change or reload the theme.  The change is not
+   permanent.
+
+ + New Python function: function msg_stats(msgbase)
+   This function works by passing the handle of an already opened message
+   base (msg_open).  It calculates and returns 4 results: Total messages,
+   new messages for the current user, number of messages addressed to the
+   user, and the unix date of the last post in the message base.   This
+   function may cause problems if used within a message reading loop, so
+   msg_seek may need to be called afterwards in that case.  Example:
+
+     total, new, yours, lastpost = msg_stats(msg)
+
+ + New Python function: function getnetaddr(number)
+   This function returns a network address configuration passed as number to
+   the function.  The result is a dictionary with the following elements:
+
+      zone, net, node, point, desc, domain, primary, addr
+
+   Primary is a 0 or 1 value, 1 being true.  Addr is a string representation
+   of zone, net, node, point.
+
+ + File Base Editor now shows Network address on the list window, and also
+   allows sorting by Base Name, File Name, and Network.
+
+ + Expanded node messages from 79 characters to 245 characters.
+
+ + Template prompts no longer have a length limit of 255 characters, they now
+   have no maximum length.
+
+ + File Base Index lister (file_index.ini) now has a sort option which allows
+   bases to appear in alphabetical order or by order of appearance in the
+   group editor.  See the default file_index.ini for example.
+
+ + Some minor changes to the menu editor, mostly cosmetic and some text
+   changes to help clarify what options are when editing a commmand.  You can
+   now also use Page Up/Down to move between menu commands without having to
+   exit back out to the list of all menu commands.  You can now use CTRL+V to
+   simulate a menu while editing an actual menu command.
+
+ + New MCI code for prompt #2: &1=User handle &2=Location
+
+ ! Fixed year 2020 bug that caused some wrong day calculations in a couple
+   of places.  The next bug should be 2038, so we have a few more years to get
+   that addressed before it becomes an issue.
+
+ + MPLC now has a -T option which will attempt to read MYSTIC.DAT either in
+   the current directory or using the mysticbbs environment variable to get
+   the Theme path, and then it will recursively compile any scripts found in
+   the Theme directory tree.  You can optionally supply the path to Mystic
+   BBS root directory if you have multiple installations.  Example:
+
+      mplc -t         - Attempts to read mystic.dat from current directory or
+                        mysticbbs environment variable, and then uses Themes
+                        path to compile.
+
+      mplc -t /mybbs  - Attempts to read mystic.dat from the supplied root
+                        directory, and then uses Themes path to compile
+
+ + MPLC now has a -F option which will attempt to read the Theme path and then
+   compile any files matching the supplied mask contained in any directories
+   under the Theme directory. Example: mplc -f bulletin*
+
+ + Improved detection of time expiration and connection loss during message
+   and file scans.
+
+ ! SEEN-BY lines should now include the net number at the start of new lines
+
+ ! Mystic SMTP client now resends "EHLO" after upgrading connection to SSL.
+   Some servers work without this step so it slipped through testing.
+
+ + MIS and FIDOPOLL now save the last dates they interacted with an echomail
+   node.  This value is now displayed in the Echomail node editor when
+   highlighting a node (Last Inbound=MIS, Last Outbound=FIDOPOLL). /R can be
+   used inside the node editor to reset stats.
+
+ ! Mystic was not using a 0-based month in PKT file headers.  Fixed.
+
+ + New prompt editor!  There is now a Reset function which will reset a prompt
+   back to the system default prompt.  The Undo function has been enhanced to
+   save the last 100 changes and will allow you to undo prompt changes
+   starting from the newest change of a prompt to the oldest if you have made
+   many changes.  The source of a prompt in the editor is now shown with the
+   following values:
+
+     Current Theme  - Prompt is customized by the current theme
+     System Default - Prompt is not part of any theme, using system default
+     <Theme Name>   - Prompt was inherited from <Theme Name>
+
+   Only current theme prompts are saved in the theme's prompts.txt.
+
+ + All theme prompts have had their maximum length in expanded from 250
+   characters to 8192 characters per prompt.
+
+ + Themes now have an ACS string that can be used to hide themes from the
+   listing.  Keep in mind when configuring your BBS to allow theme selection
+   on connect: There will not be a user known at that time so any security
+   will cause the theme not to show.
+
+   The ACS is for the listing only.  The purpose is mostly to hide themes
+   while they are in development.  Themes can still be selected regardless
+   of ACS using using a menu command:
+
+      Command: GE (Edit User Settings)
+         Data: 14 mytheme
+
+ + The GE suboption 14 menu command (select theme) now has a /RELOAD option
+   which causes the current theme prompts to refresh:
+
+      Command: GE (Edit User Settings)
+         Data: 14 /reload
+
+ + Themes now have an "Order" property which determines which themes are
+   listed first.  Values can be between 1-65000 with the lowest numbers
+   being listed first.  Themes will also be listed in the Themes editor using
+   this value.
+
+ ! Fixed a bug that could cause protocol downloads to get stuck on a
+   connection drop
+
+ + MUTIL's MsgPurge now validates that messages are from or addressed to valid users
+   if the base type is Private or the base allows for Private replies within
+   the base.
+
+ + By request, Mystic no longer shows the OS and Node number when initially
+   connecting to the BBS.  If you wish to add this back you can use MCI codes
+   or tell me why you think it needs to be reverted!
+
+ ! Fixed a bug where MSGID could result in 0:0/0 when zone matching a Netmail
+   base with no address assigned to it.
+
+ + Mystic no longer logs the actual bad password text.  This should have
+   been removed a long time ago but I always liked seeing what the scripted
+   bots tried to log in with when they found my BBS.
+
+ + Rewrote all of the FLO add/remove functions with improved file locking to
+   address potential race conditions.
+
+ ! Fixed an issue with a file resume race condition in BinkP client/server
+
+ ! Fixed an memory leak introduced in A43 that could cause a rescan to give
+   corrupt message(s) in a packet.
+
+ + Msg/File base global editors now ask you if you want to abort when pressing
+   escape to exit.
+
+ + Echonode editor now warns you if you edit a node and save it with a 0:0/0
+   address or a missing domain.
+
+   <ALPHA 1.12 A44 RELEASED -- February 4th, 2020>
+
+ ! Fixed bug in Python setprompt function.
+
+ ! Rewrote some old DOS compatibility wrappers so that Mystic no longer
+   localizes the file times in BinkP sessions.
+
+ ! Similar to BinkP Mystic no longer localizes the system time in the Path
+   portion of a TIC file.
+
+ ! Fixed a bug with Lightbar/Grid style menus that was causing them to not
+   handle extended key jumps properly.
+
+ ! Fixed a bug in the nodelist browser that could cause some results to show
+   the wrong Net number.
+
+ + Menu Command: GE option 17 (Change file list type) can now have an option
+   of 0 or 1 (0=standard 1=lightbar) to set the type without prompting
+
+      Command: GE (Edit user settings)
+         Data: 17 1
+
+ + Menu command: GE option 20 (Change message reader type) can now have an
+   option of 0 or 1 (0=standard 1=lightbar) to set type without prompting
+
+      Command: GE (Edit user settings)
+         Data: 20 1
+
+ + Revamped the MUTIL startup code so that it provides better details in the
+   errors.log should it fail to start up for any reason.
+
+ ! Fixed broken outbound SSH (Menu command IS)
+
+ + When entering Echomail addresses, Mystic will now automatically assign the
+   Primary address if one isn't defined.  Primary flag will also be removed if
+   an address is set to 0:0/0 with primary flag.
+
+ + Mystic BINKP server now sends an M_ERR frame and aborts the session if it
+   receives what looks to be nonsense from the remote client.  Previously it
+   would wait until timeout.
+
+ + When Mystic's Firewall has blocked a connection it will now detect if the
+   connection was intended to be BINKP and send a "BUSY" flag with a note that
+   says the connection is blocked.  FIDOPOLL will now detect this as well.
+
+ ! Fixed a bug where a user's scan settings for a base could get "stuck" in
+   Forced mode if a base was forced and then changed.
+
+ + Mystic now has an "Auto Whitelist IP" option in Login/Matrix settings. This
+   option can have two values: "User Flag", or "All Users".
+
+   When set to "User Flag" Mystic will check a flag on the user's account
+   called "Whitelist IP" and if its set, it will automatically whitelist the
+   IP of the user who logged in if it is not already whitelisted.
+
+   When set to "All Users" Mystic will automatically whitelist the IP
+   of all users who successfully log into the BBS.
+
+   <ALPHA 1.12 A45 RELEASED -- February 18, 2020>
+
+ + Mystic Linux version no longer uses command line options for password
+   during RLOGIN and SSH sessions.  It now privately passes using a 512
+   bit hash.
+
+ - The old MI Message Index Reader has been removed and replaced with the
+   newer Index reader.  This "new" index reader has been in Mystic to be
+   tested under the M! menu command for more than a year so it is time to
+   get rid of the old.  The default template is msg_index so you should
+   copy msg_index.ans and msg_index.ini during upgrade if you haven't yet.
+
+ + Mystic's BINKP server now has an "SSL Port" option which when set to a
+   non-zero value will also run the BINKP server in direct SSL mode.
+
+ - Removed the Opportunistic BINKP SSL/TLS extension support as Mystic was
+   the only known software to support it and it was unlikely other software
+   would adopt it.  Maybe I'll bring it back someday as I do prefer this
+   method of BINKP server.
+
+ + Mystic's BINKP server now allows the "Port" option to be set to 0 to
+   disable non-SSL connections when used in combination with the SSL Port
+   option, so that Mystic will only accept SSL BINKP connections.
+
+ + FIDOPOLL and EchoMail node entries now have a "Use SSL" option which flags
+   whether or not the node being configured for BINKP is an SSL BINKP node or
+   not.  Note: The default port for BINKP SSL is 24553.
+
+ ! Fixed a bug where stale .BSY files were not getting deleted properly.
+
+ ! Fixed a potential incompatiblity issue with some versions of Cryptlib.
+
+ ! Fixed an issue where a file that contains "file_id.diz" in its filename but
+   is not an exact match could get left in the temp directory when uploading
+   files.
+
+ + MIS now has a replacement for FIDOPOLL built into it and is accessible by
+   the "POLL" command line.  This still supports BINKP, BINKPSSL, FTP and
+   Directory connections and has the "send "force" and poll by address lookup
+   options contained in the original.
+
+   The benefits here besides having one less binary as part of the Mystic
+   package is that it has a better user interface, better logging, and can
+   have an unlimited number of concurrent outbound connections (defaulting
+   to 7 for now).
+
+   For example if you have 2 FTP uplinks and 5 BINKP nodes that all have mail
+   you can run the "mis poll send" command line it will attempt to send to all
+   7 nodes at the simultaneously instead of one after the other.
+
+   Eventually FIDOPOLL will be replaced so it may be a good idea to switch
+   over to using this sometime soon.
+
+ + When attempting to connect to an outbound mail server, MIS will now wait
+   only 6 seconds, down from 10 before assuming the connection is unavailable
+
+ + MUTIL MsgLink no longer spams every single message base into the logging
+   regardless of loglevel.  Only the base name will be shown if there were
+   messages actually linked within that base (level 2) and a list of the
+   actual links (level 3)
+
+ + MIS POLL now tracks send and receive file statistics (number of files and
+   size) for FTP-based FTN transmission.
+
+ + MIS POLL now tracks connection errors for outbound connections for both
+   FTP and BINKP style connections.
+
+ + New MUTIL function [EchoNodeTracker] can be used for various HUB-related
+   utilities to automate downlink management.  Features include:
+
+      - Suspending echomail nodes based on days of inactivity
+          - Optionally unlinking message/file base subscriptions
+          - Optionally deleting their entire outbound mail queue
+      - Changing mail and filebox crash nodes to hold-only after a set
+        number of failed outbound connection attempts
+      - Automated resetting of echomail tracking statistics after X days
+
+   See default MUTIL.INI [EchoNodeTracker] stanza for more information.
+
+ + When changing a node from "Inactive" to "Active" in the Echomail node
+   editor, Mystic will now ask if you'd like to reset the node's statistics.
+
+ + EchoNode editor now shows a "Crash Errors" statistic which is the number
+   of failed outbound connect attempts since last reset.
+
+ + CHATx.DAT files now include the Process ID of the current process running
+   the node and the updated field now uses a Unix timestamp.
+
+ + Users now have a new flag that when set to Yes will always log them in as
+   invisible, bypassing the login as invisisble prompt when set to Yes.
+
+ ! Fixed a bug with BINKP where Mystic could send a 0 byte length data frame
+   if a file size was exactly evenly divisible by the buffer size.
+
+ + Mystic now allows the -Nx command line to be supplied to force a specific
+   node number if you want to log into it.  You should still not use this and
+   let Mystic manage the number numbers itself, but I've added this for those
+   that seem to be trying to do this for some reason.
+
+ ! Fixed a bug with SSL and BINKP where the data frame size could be
+   improperly calculated under severely throttled/poor latency connections.
+
+ + Two new Python functions: msg_getlr and msg_setlr to get and set the
+   lastread pointer for the currently opened message base.
+
+     Syntax: msg_getlr (msgbase, userID) returns last read message
+         Ex: lastread = msg_getlr(msgbase, user["id"])
+
+     msgbase is the open message base pointer returned by msg_open
+     userID is the user's unique ID found in the "id" field of a user
+     lastread is a signed 32-bit integer of the last read message which can
+     be passed to msg_seek, for example.
+
+     Syntax: msg_setlr (msgbase, userID, userHandle, lastread)
+         Ex: msg_setlr (msgbase, user["id"], user["handle"], lastread)
+
+     The user handle should always be passed (not the real name) as this value
+     will be hashed as required when a new last read record needs to be added
+     for the user.
+
+ ! When deleting an Echomail node, Mystic was not delinking the nodes from
+   file bases causing an "Unknown node" message to appear in file bases.
+
+ + Revamped group configuration.  Group names have been expanded to 80
+   characters.  Groups now have new ShortName field (40 characters).  Groups
+   now have a InfoFile field (40 characters), and each group's Hidden boolean
+   has been changed to a flags field.
+
+ + New MCI code: <pipe>FS returns the current file group short name
+
+ + New MCI code: <pipe>MS returns the current message group short name
+
+ + MPL groups now have "groupshort" and "groupinfo" and "groupflags" variables
+
+ + Python groups now have "shortname" "infofile" and "flags" entries in the
+   group dictionary.
+
+ + MIS.LOG now has configurable log rolling in the System Configuration >
+   Servers > Logging section.
+
+ + POLL.LOG now has configurable log rolling in the System Configuration >
+   Servers > Logging section.
+
+ + When using GOSUB/RETURN with Lightbar menus, Mystic will now remember your
+   last selected item and return the cursor position to it when returning.
+   If you want to reset the cursor, use /CURSOR on the data field of your GR
+   menu command.
+
+ ! MIS was not refusing to run if the Mystic BBS data files did not match the
+   version of MIS.
+
+ ! When in the text editor in view only mode, the backspace key was still
+   working in edit mode.
+
+ ! Mystic was being way too aggressive with SSL read/write timeout values
+   which may have caused some errors in SSL BINKP.
+
+ + New option: "Ask Message Post" in message settings, when set to yes or no
+   determines if Mystic will ask users if they'd like to post after reading
+   a message base.
+
+ + Mystic's message readers will now print all the maximum column width per
+   line instead of columns - 1.  This means that your message reading
+   template will need to not use the bottom line of the user's terminal for
+   message text or it will cause the user's terminal to scroll.  This may be
+   reverted back, but we'll see how it goes and how it effects people.
+
+ ! When toggling show kludges (V) in the standard message reader, Mystic was
+   not automatically displaying the message.
+
+ + Max number of simultaneous poll connections is now configurable in the
+   Servers > General Options section of System Configuration
+
+ + When tossing TIC files, the dir_prefix can now be defined by source address
+   as with other settings.
+
+ + New command line option -AUTH <user> <password> checks the supplied user
+   and password and prints TRUE if the user exists and password matches or
+   FALSE otherwise and then immediately exits.
+
+ ! Fixed a bug in Linux versions where Mystic would couldn't find files in the
+   file base when hatching a file, despite it actually existing.
+
+ ! Fixed a bug that could cause some long lines in echomail packets to get
+   truncated at 255 characters when tossing messages.
+
+ ! Fixed a bug in the FTP server that would confuse some FTP clients when
+   closing a data connection (sending two 226 responses after successful
+   transfer).
+
+ + Mystic now allows a single message base to be assigned to a QWK network
+   when operating as a hub, and a FidoNet style network.  Gating will be
+   automatic when configured for both.
+
+ ! Fixed a bug when copying an event in the event editor that would cause it
+   to have the same unique ID as the original event.  This could cause some
+   events to save incorrectly.  When editing an event, all IDs should be
+   unique (the ID is shown at the top of the edit window). Review your events
+   and if you have any that have a duplicate ID you should either make a copy
+   and then delete the original or just delete the original and remake it so
+   all events have a unique ID.
+
+ + MUTIL ImportEchomail now has a bad_packet setting which defines a directory
+   where bad packets are moved to when an error occurs during import.
+
+ + New Python function: flush().  This forces any data currently in Mystic's
+   outbound buffer to be sent to the remote client.  In almost all
+   circumstances Mystic handles this for you so this will not be needed.
+
+ + New Python function: purgeinput().  This clears out any input currently in
+   Mystic's input buffer.  In most cases when doing any IO with the user Mystic
+   will handle this on its own.
+
+ ! Mouse support was not working in Lightbar menus.  Not sure when this was
+   broken but it was probably when I changed how NetRunner mouse support
+   worked in Beta 19.
+
+ + Msg listing and file listing was not working properly with mouse support
+   but I also changed it to allow clicking an already selected message or
+   file to read the message or flag the file respectively.
+
+ + New MCI codes for setting high intensity background colors ON or OFF for
+   compatible terminals like NetRunner and SyncTerm:
+
+      CY - Turns iCE colors ON
+      CN - Turns iCE colors OFF
+
+ + New Menu Command: XV.  This option allows the user to validate their
+   e-mail address from the Matrix login menu.
+
+ + Users can now be created in the User Editor by using the CTRL+A hotkey
+
+ + Updated the defaults for Matrix login so it no longer uses a Matrix
+   password by default.
+
+ ! Fixed a bug in the QWKPOLL FTP client and the FTN FTP client that was
+   causing non-passive mode to fail.
+
+ ! Fixed a display bug in the From field of routed Netmail messages.
+
+ ! MIS was not resolving the "Country" of the connection when the IP address
+   was whitelisted.
+
+ + Area/Filefix both now accept %QUERY which works the same as %LINKED
+
+ ! Fixed a bug with the MPL compiler and the DateValid fuction
+
+ + New users can now be created from the command line using the -NEWUSER
+   option followed by a series of attributes in any order:
+
+     mystic -newuser handle=myhandle "name=real name" pass=mypass
+     email=mysticbbs@gmail.com level=10
+
+   Mystic will print TRUE or FALSE to STDIO depending on if the user was
+   successfully created or not.  The command line MUST have a handle, name,
+   and password attribute at a minimum for the create to succeed.
+
+   The level value will accept anything less than 250.  Any new user created
+   with a level of 250 or higher will be rejected.
+
+ + The "hackwarn.txt", "newletter.txt" and "sysletter.txt" automatic messages
+   will now be sent from/to the "Feedback To" setting instead of using the
+   SysOp name setting.
+
+ + When searching for a user name, typing "SYSOP" will now translate to the
+   "Feedback To" user setting instead of the SysOp Name.
+
+ ! MUTIL PostTextFile was not using the default Origin line when the base's
+   origin line was blank.
+
+ + When executing an archive, MIS and MUTIL will now automatically append
+   2>nul redirect to prevent leaking error messages.
+
+ ! Did a review of the FTP server code which resulted in a bug fix and a fix
+   of a memory leak when using passive and extended passive modes.  Server
+   stability has also been (hopefully) increased.
+
+ ! Fixed a bug with QWK packet generation when message text lines are longer
+   than 255 characters.  This bug existed both in the BBS and the QWK
+   Networking engines.
+
+ + Mystic-DOS "EDIT" command now also accepts "nano" and "notepad" for those
+   of you who have that stuck in your head.
+
+ + Two new MCI codes to show message status of E-mail base:
+
+      MW : Shows the number of messages in your e-mail box
+      MU : Shows the number of unread messages in your mailbox
+
+   Note that these values are set to 0 until the MC (Check E-mail) menu
+   command is executed.  The values are calculated at that time.
+
+ + New optional data option for menu command MC (Check E-mail): /SCAN
+   If /SCAN is supplied the MC command will only calculate the current
+   mailbox stats (total messages and unread messages) without having any
+   display or interaction with the user.  These values will be stored in
+   the MU and MW MCI codes.
+
+   <ALPHA 1.12 A46 RELEASED -- August 26, 2020>

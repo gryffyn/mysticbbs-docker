@@ -1,3 +1,3 @@
-# mysticbbs
+# mysticbbs-docker
 
-Docker basic install of the mystic BBS software
+Runs [Mystic](http://www.mysticbbs.com/index.html) in a Docker container.
